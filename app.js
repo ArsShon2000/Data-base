@@ -1,4 +1,3 @@
-// import List from './List'
 
 require('dotenv').config()
 
@@ -27,70 +26,122 @@ const corsOptions = {
   }
 };
 
+
 app.use(cors(corsOptions));
 
 app.use(bodyParser.urlencoded({extended: true}))
 
 app.post('/create-db-w', () => {
     db.run(
-        `CREATE TABLE wNum(car_number);`
+        `CREATE TABLE wNum(id INTEGER PRIMARY KEY AUTOINCREMENT, car_number, name);`
     )
 })
 
 
 app.post('/create-db-b', () => {
     db.run(
-      `CREATE TABLE bNum(car_number);`
+      `CREATE TABLE bNum(id INTEGER PRIMARY KEY AUTOINCREMENT, car_number, name);`
     )
 })
-
-
-app.delete('/delete-db-w', () => {
-    db.run(
-        `DROP TABLE wNum;`
-    )
+ 
+app.delete('/delete-db-W', () => {
+  db.run(
+    `DROP TABLE WNum;`
+  )
 })
-
 
 app.delete('/delete-db-b', () => {
-    db.run(
-      `DROP TABLE bNum;`
-    )
+  db.run(
+    `DROP TABLE bNum;`
+  )
 })
+
+// delFunction
+//удаление по номеру
+app.delete('/wNum/:car_number', (req, res) => {
+  
+  const {car_number} = req.params
+
+  const sql = `DELETE FROM wNum WHERE car_number = ?`
+  db.run(sql, [car_number], (error) => {
+    if (error) return console.error(error);
+    res.send({ message: 'Deleted' })
+  })
+})
+
+// удаление по владельцу
+app.delete('/wNum/:name', (req, res) => {
+  
+  const {name} = req.params
+
+  const sql = `DELETE FROM wNum WHERE name = ?`
+  db.run(sql, [name], (error) => {
+    if (error) return console.error(error);
+    res.send({ message: 'Deleted' })
+  })
+})
+
+//удаление по номеру
+app.delete('/bNum/:car_number', (req, res) => {
+  
+  const {car_number} = req.params
+
+  const sql = `DELETE FROM bNum WHERE car_number = ?`
+  db.run(sql, [car_number], (error) => {
+    if (error) return console.error(error);
+    res.send({ message: 'Deleted' })
+  })
+})
+
+// удаление по владельцу
+app.delete('/bNum/:car_number', (req, res) => {
+  
+  const {car_number} = req.params
+
+  const sql = `DELETE FROM bNum WHERE car_number = ?`
+  db.run(sql, [car_number], (error) => {
+    if (error) return console.error(error);
+    res.send({ message: 'Deleted' })
+  })
+})
+
+// delFunction
 
 
 app.get('/wNum', (req, res) => {
-    const sql = `SELECT * FROM wNum`
+  const sql = `SELECT * FROM wNum`
   db.all(sql, [], (error, rows) => {
     if (error) return console.error(error);
-    res.send({wNum: rows})
+    let info = rows[0]
+    res.send({ wNum: rows})
+    console.log(info.name)
   })
 })
 
 
 app.get('/bNum', (req, res) => {
-    const sql = `SELECT * FROM bNum`
+  const sql = `SELECT * FROM bNum`
   db.all(sql, [], (error, rows) => {
     if (error) return console.error(error);
-    res.send({bNum: rows})
+    res.send({ bNum: rows})
   })
-})
+}) 
 
 
 app.post('/wNum', (req, res) => {
-    const {carNumber} = req.body;
-    const sql = `INSERT INTO wNum(car_number) VALUES(?)`
-  db.run(sql, [ carNumber], (error) => {
+  const { carNumber, name } = req.body;
+  const sql = `INSERT INTO wNum(car_number, name) VALUES(?, ?)`
+  db.run(sql, [carNumber, name], (error) => {
     if (error) return console.error(error);
-    res.send({message: 'ok'})
+    res.send({ message: 'ok' })
   })
 })
 
 
 app.post('/bNum', (req, res) => {
-    const {carNumber} = req.body;
-    const sql = `INSERT INTO bNum(car_number) VALUES(?)`
-  db.run(sql, [ carNumber], (error) => {
+    const {carNumber, name} = req.body;
+    const sql = `INSERT INTO bNum(car_number, name) VALUES(?, ?)`
+  db.run(sql, [ carNumber, name], (error) => {
     if (error) return console.error(error);
     res.send({message: 'ok'})
   })
@@ -102,4 +153,3 @@ app.listen(5000, () => {
 })
 
 module.exports = app
-
