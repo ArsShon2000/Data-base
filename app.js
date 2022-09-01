@@ -31,18 +31,54 @@ app.use(cors(corsOptions));
 
 app.use(bodyParser.urlencoded({extended: true}))
 
+// создание списка имен для белого списка
+app.post('/create-db-wn', () => {
+  db.run(
+      `CREATE TABLE wNames (id_name INTEGER PRIMARY KEY AUTOINCREMENT, 
+                                        name TEXT UNIQUE);`
+  )
+})
+
+
+// создание списка для белого списка
 app.post('/create-db-w', () => {
     db.run(
-        `CREATE TABLE wNum(id INTEGER PRIMARY KEY AUTOINCREMENT, car_number, name);`
+        `CREATE TABLE wNum(id INTEGER PRIMARY KEY AUTOINCREMENT,
+          car_number, 
+          name,
+          id_name,
+          CONSTRAINT fk_wNames
+          FOREIGN KEY (id_name) REFERENCES wNames (id_name)
+          );`
     )
 })
 
-
+// создание списка для черного списка
 app.post('/create-db-b', () => {
     db.run(
-      `CREATE TABLE bNum(id INTEGER PRIMARY KEY AUTOINCREMENT, car_number, name);`
+      `CREATE TABLE bNum(id INTEGER PRIMARY KEY AUTOINCREMENT, 
+        car_number, 
+        name);`
     )
 })
+
+// // создание списка для генератора номера (long)
+// app.post('/create-db-long', () => {
+//   db.run(
+//     `CREATE TABLE genNomLong(car_number);`
+//   )
+// })
+
+
+// // создание списка для генератора номера (short)
+// app.post('/create-db', () => {
+//   db.run(
+//     `CREATE TABLE genNomShort(car_number);`
+//   )
+// })
+
+
+
  
 app.delete('/delete-db-W', () => {
   db.run(
@@ -94,12 +130,12 @@ app.delete('/bNum/:car_number', (req, res) => {
 })
 
 // удаление по владельцу
-app.delete('/bNum/:car_number', (req, res) => {
+app.delete('/bNum/:name', (req, res) => {
   
-  const {car_number} = req.params
+  const {name} = req.params
 
-  const sql = `DELETE FROM bNum WHERE car_number = ?`
-  db.run(sql, [car_number], (error) => {
+  const sql = `DELETE FROM bNum WHERE name = ?`
+  db.run(sql, [name], (error) => {
     if (error) return console.error(error);
     res.send({ message: 'Deleted' })
   })
@@ -107,18 +143,18 @@ app.delete('/bNum/:car_number', (req, res) => {
 
 // delFunction
 
-
+// получаем данные из бд
 app.get('/wNum', (req, res) => {
   const sql = `SELECT * FROM wNum`
   db.all(sql, [], (error, rows) => {
     if (error) return console.error(error);
-    let info = rows[0]
+    // let info = rows[0]
     res.send({ wNum: rows})
-    console.log(info.name)
+    // console.log(info.name)
   })
 })
 
-
+// получаем данные из бд
 app.get('/bNum', (req, res) => {
   const sql = `SELECT * FROM bNum`
   db.all(sql, [], (error, rows) => {
@@ -127,7 +163,28 @@ app.get('/bNum', (req, res) => {
   })
 }) 
 
+// // получаем данные из бд которые в текстовом файле
+// app.get('/genNomLong', (req, res) => {
+//   const sql = `SELECT * FROM genNomLong`
+//   db.all(sql, [], (error, rows) => {
+//     if (error) return console.error(error);
+//     res.send({ genNomLong: rows})
+//   })
+// })
 
+
+// // получаем данные из бд которые в текстовом файле
+// app.get('/genNomShort', (req, res) => {
+//   const sql = `SELECT * FROM genNomShort`
+//   db.all(sql, [], (error, rows) => {
+//     if (error) return console.error(error);
+//     res.send({ genNomShort: rows})
+//   })
+// })
+
+
+
+// добавление данных в белый список
 app.post('/wNum', (req, res) => {
   const { carNumber, name } = req.body;
   const sql = `INSERT INTO wNum(car_number, name) VALUES(?, ?)`
@@ -137,7 +194,18 @@ app.post('/wNum', (req, res) => {
   })
 })
 
+// добавление имени в белый список
+app.post('/wNames', (req, res) => {
+  const { name } = req.body;
+  const sql = `INSERT INTO wNames( name) VALUES( ?)`
+  db.run(sql, [ name], (error) => {
+    if (error) return console.error(error);
+    res.send({ message: 'ok' })
+  })
+})
 
+ 
+// добавление данных в черный список
 app.post('/bNum', (req, res) => {
     const {carNumber, name} = req.body;
     const sql = `INSERT INTO bNum(car_number, name) VALUES(?, ?)`
@@ -146,6 +214,27 @@ app.post('/bNum', (req, res) => {
     res.send({message: 'ok'})
   })
 })
+
+// // добавление данных из текстового файла
+// app.post('/genNomLong', (req, res) => {
+//   const {carNumber} = req.body;
+//   const sql = `INSERT INTO genNomLong(car_number) VALUES('long.txt',readfile('long.txt'))`
+// db.run(sql, [ carNumber], (error) => {
+//   if (error) return console.error(error);
+//   res.send({message: 'ok'})
+// })
+// })
+
+// // добавление данных из текстового файла
+// app.post('/genNomShort', (req, res) => {
+//   const {carNumber} = req.body;
+//   const sql = `INSERT INTO genNomShort(car_number) VALUES('short.txt',readfile('short.txt'))`
+// db.run(sql, [ carNumber], (error) => {
+//   if (error) return console.error(error);
+//   res.send({message: 'ok'})
+// })
+// })
+
 
 
 app.listen(5000, () => {
