@@ -34,7 +34,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.post('/create-db-wn', () => {
   db.run(
     `CREATE TABLE wNames (id_name INTEGER PRIMARY KEY AUTOINCREMENT, 
-                                        name TEXT UNIQUE);`
+                                        name);`
   )
 })
 
@@ -42,7 +42,7 @@ app.post('/create-db-wn', () => {
 app.post('/create-db-w', () => {
   db.run(
     `CREATE TABLE wNum(id INTEGER PRIMARY KEY AUTOINCREMENT,
-          car_number, 
+          car_number TEXT UNIQUE, 
           name,
           id_name,
           CONSTRAINT fk_wNames
@@ -65,7 +65,7 @@ app.post('/create-db-bn', () => {
 app.post('/create-db-b', () => {
   db.run(
     `CREATE TABLE bNum(id INTEGER PRIMARY KEY AUTOINCREMENT,
-          car_number, 
+          car_number TEXT UNIQUE, 
           name,
           id_name,
           CONSTRAINT fk_bNames
@@ -169,9 +169,19 @@ app.get('/wNames', (req, res) => {
   const sql = `SELECT * FROM wNames`
   db.all(sql, [], (error, rows) => {
     if (error) return console.error(error);
-    // let info = rows[3]
+    let info = rows.length
     res.send({ wNames: rows })
-    // console.log(info.name)
+    console.log(info)
+  })
+})
+
+app.get('/wNamesLength', (req, res) => {
+  const sql = `SELECT * FROM wNames`
+  db.all(sql, [], (error, rows) => {
+    if (error) return console.error(error);
+    let info = rows.length
+    res.send({ wNamesLength: info })
+    console.log(info)
   })
 })
 
@@ -222,12 +232,12 @@ app.get('/bNames', (req, res) => {
 
 // добавление данных в белый список 
 app.post('/wNum', (req, res) => {
-  const { carNumber, name, id_name } = req.body;
+  const { carNumber, name, id_name} = req.body;
   const sql = `INSERT INTO wNum(car_number, name, id_name) VALUES(?, ?, ?)`
-  db.run(sql, [carNumber, name, id_name], (error) => {
+  if(carNumber != ''){db.run(sql, [carNumber, name, id_name], (error) => {
     if (error) return console.error(error);
     res.send({ message: 'ok' })
-  })
+  })}
 })
 
 // добавление имени в белый список
@@ -246,10 +256,10 @@ app.post('/wNames', (req, res) => {
 app.post('/bNum', (req, res) => {
   const { carNumber, name, id_name  } = req.body;
   const sql = `INSERT INTO bNum(car_number, name, id_name) VALUES(?, ?, ?)`
-  db.run(sql, [carNumber, name, id_name], (error) => {
+  if(carNumber != ''){db.run(sql, [carNumber, name, id_name], (error) => {
     if (error) return console.error(error);
     res.send({ message: 'ok' })
-  })
+  })}
 })
 
 // добавление имени в черный список
