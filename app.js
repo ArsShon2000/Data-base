@@ -38,16 +38,20 @@ app.post('/create-db-wn', () => {
   )
 })
 
+app.post('/create-db-wn2', () => {
+  db.run(
+    `CREATE TABLE wNames2 (id_name INTEGER PRIMARY KEY AUTOINCREMENT, 
+                                        name);`
+  )
+})
+
 // создание списка для белого списка
 app.post('/create-db-w', () => {
   db.run(
     `CREATE TABLE wNum(id INTEGER PRIMARY KEY AUTOINCREMENT,
-          car_number TEXT UNIQUE, 
-          name,
-          id_name,
-          CONSTRAINT fk_wNames
-          FOREIGN KEY (id_name) REFERENCES wNames (id_name)
-          );`
+      id_name,
+      name, 
+      car_number TEXT UNIQUE);`
   )
 })
 
@@ -120,10 +124,10 @@ app.delete('/wNum/:car_number', (req, res) => {
 })
 
 // удаление по владельцу
-app.delete('/wNames/:name', (req, res) => {
-  const { name } = req.params
-  const sql = `DELETE FROM wNames WHERE name = ?`
-  db.run(sql, [name], (error) => {
+app.delete('/wNames/:id_name', (req, res) => {
+  const { id_name } = req.params
+  const sql = `DELETE FROM wNames WHERE id_name = ?`
+  db.run(sql, [id_name], (error) => {
     if (error) return console.error(error);
     res.send({ message: 'Deleted' })
   })
@@ -155,13 +159,13 @@ app.delete('/bNames/:name', (req, res) => {
 
 // получаем white данные из бд по номеру
 app.get('/wNum', (req, res) => {
-    const sql = `SELECT * FROM wNum`
-    db.all(sql, [], (error, rows) => {
-      if (error) return console.error(error);
-      // let info = rows[9]
-      res.send({ wNum: rows })
-      // console.log(info.name)
-    })
+  const sql = `SELECT * FROM wNum`
+  db.all(sql, [], (error, rows) => {
+    if (error) return console.error(error);
+    // let info = rows[9]
+    res.send({ wNum: rows })
+    // console.log(info.name)
+  })
 })
 
 // получаем white данные из бд по имени
@@ -175,16 +179,16 @@ app.get('/wNames', (req, res) => {
   })
 })
 
-app.get('/wNamesLength', (req, res) => {
-  const sql = `SELECT * FROM wNames`
+// получаем white данные из бд по имени
+app.get('/wNames2', (req, res) => {
+  const sql = `SELECT * FROM wNames2`
   db.all(sql, [], (error, rows) => {
     if (error) return console.error(error);
     let info = rows.length
-    res.send({ wNamesLength: info })
+    res.send({ wNames2: rows })
     console.log(info)
   })
 })
-
 //-------------------------------------------------------------------------------------------------------------------
 
 // получаем black данные из бд
@@ -231,35 +235,48 @@ app.get('/bNames', (req, res) => {
 //==============================================================================================
 
 // добавление данных в белый список 
+
 app.post('/wNum', (req, res) => {
-  const { carNumber, name, id_name} = req.body;
+  const { carNumber, name, id_name } = req.body;
   const sql = `INSERT INTO wNum(car_number, name, id_name) VALUES(?, ?, ?)`
-  if(carNumber != ''){db.run(sql, [carNumber, name, id_name], (error) => {
-    if (error) return console.error(error);
-    res.send({ message: 'ok' })
-  })}
+  if (carNumber != '') {
+    db.run(sql, [carNumber, name, id_name], (error) => {
+      if (error) return console.error(error);
+      res.send({ message: 'ok' })
+    })
+  }
 })
 
 // добавление имени в белый список
 app.post('/wNames', (req, res) => {
   const { name } = req.body;
-  const sql = `INSERT INTO wNames(name) VALUES(?)`
+  const sql = `INSERT INTO wNames( name) VALUES( ?)`
   db.run(sql, [name], (error) => {
     if (error) return console.error(error);
     res.send({ message: 'ok' })
   })
 })
 
+app.post('/wNames2', (req, res) => {
+  const { name } = req.body;
+  const sql = `INSERT INTO wNames2 ( name) VALUES( ?)`
+  db.run(sql, [name], (error) => {
+    if (error) return console.error(error);
+    res.send({ message: 'ok' })
+  })
+})
 //-------------------------------------------------------------------------------------------------------------------
 
 // добавление данных в черный список
 app.post('/bNum', (req, res) => {
-  const { carNumber, name, id_name  } = req.body;
+  const { carNumber, name, id_name } = req.body;
   const sql = `INSERT INTO bNum(car_number, name, id_name) VALUES(?, ?, ?)`
-  if(carNumber != ''){db.run(sql, [carNumber, name, id_name], (error) => {
-    if (error) return console.error(error);
-    res.send({ message: 'ok' })
-  })}
+  if (carNumber != '') {
+    db.run(sql, [carNumber, name, id_name], (error) => {
+      if (error) return console.error(error);
+      res.send({ message: 'ok' })
+    })
+  }
 })
 
 // добавление имени в черный список
