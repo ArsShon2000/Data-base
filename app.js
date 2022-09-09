@@ -1,6 +1,7 @@
 
 require('dotenv').config()
 
+let bool = true
 const express = require('express')
 const cors = require('cors')
 const sqlite3 = require('sqlite3').verbose();
@@ -12,6 +13,7 @@ const db = new sqlite3.Database('./mock.db', sqlite3.OPEN_READWRITE, (error) => 
 
   console.log('connected successfully')
 })
+let i = 0
 
 app.use(bodyParser.json())
 const corsOptions = {
@@ -21,7 +23,7 @@ const corsOptions = {
     //     return callback(null, true)
     //
     // callback(new Error('Not allowed by CORS'));
-    console.log("origin: ", origin);
+    console.log("origin: ", origin, i++);
     callback(null, true); // everyone is allowed
   }
 };
@@ -55,6 +57,11 @@ app.post('/create-db-w', () => {
   )
 })
 
+app.post('/create-login', () => {
+  db.run(
+    `CREATE TABLE login (bool);`
+  )
+})
 //-------------------------------------------------------------------------------------------------------------------
 
 // создание списка для черного списка
@@ -133,6 +140,18 @@ app.delete('/wNames/:id_name', (req, res) => {
   })
 })
 
+
+// ==========================================================
+// logout
+app.delete('/login/:bool', (req, res) => {
+  bool = true
+  const sql = `DELETE FROM login WHERE bool = ?`
+  db.run(sql, [bool], (error) => {
+    if (error) return console.error(error);
+    res.send({ message: 'Deleted' })
+  })
+})
+
 //-------------------------------------------------------------------------------------------------------------------
 
 //удаление по номеру
@@ -175,7 +194,7 @@ app.get('/wNames', (req, res) => {
     if (error) return console.error(error);
     let info = rows.length
     res.send({ wNames: rows })
-    console.log(info)
+    console.log("info")
   })
 })
 
@@ -184,9 +203,20 @@ app.get('/wNames2', (req, res) => {
   const sql = `SELECT * FROM wNames2`
   db.all(sql, [], (error, rows) => {
     if (error) return console.error(error);
-    let info = rows.length
+    // let info = rows.length
     res.send({ wNames2: rows })
-    console.log(info)
+    // console.log(info)
+  })
+})
+// =======================================================
+// проверка на авторизацию
+app.get('/login', (req, res) => {
+  const sql = `SELECT * FROM login`
+  db.all(sql, [], (error, rows) => {
+    if (error) return console.error(error);
+    // let info = rows.length
+    res.send({ login: rows })
+    // console.log(info)
   })
 })
 //-------------------------------------------------------------------------------------------------------------------
@@ -264,6 +294,21 @@ app.post('/wNames2', (req, res) => {
     if (error) return console.error(error);
     res.send({ message: 'ok' })
   })
+})
+
+// ==============================================
+// login
+
+app.post('/login', (req, res) => {
+  const { login, password } = req.body;
+  if(login === "admin" && password === "admin"){
+    bool = true
+  const sql = `INSERT INTO login (bool) VALUES( ?)`
+  db.run(sql, bool, (error) => {
+    if (error) return console.error(error);
+    res.send({ message: 'ok' })
+  })
+}
 })
 //-------------------------------------------------------------------------------------------------------------------
 

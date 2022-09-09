@@ -1,5 +1,8 @@
 // const { keyboard } = require('@testing-library/user-event/dist/keyboard')
 
+const { text } = require('body-parser')
+const { trace } = require('./app')
+
 const sqlite3 = require('sqlite3').verbose()
 const dbName = 'later.sqlite'
 const db = new sqlite3.Database(dbName)
