@@ -13,7 +13,8 @@ const db = new sqlite3.Database('./mock.db', sqlite3.OPEN_READWRITE, (error) => 
 
   console.log('connected successfully')
 })
-let i = 0
+let ID_Name
+let posetitely = 0
 
 app.use(bodyParser.json())
 const corsOptions = {
@@ -23,7 +24,7 @@ const corsOptions = {
     //     return callback(null, true)
     //
     // callback(new Error('Not allowed by CORS'));
-    console.log("origin: ", origin, i++);
+    console.log("origin: ", origin, posetitely++);
     callback(null, true); // everyone is allowed
   }
 };
@@ -32,13 +33,14 @@ app.use(cors(corsOptions));
 
 app.use(bodyParser.urlencoded({ extended: true }))
 //==============================================================================================
+
 // создание списка имен для белого списка
-app.post('/create-db-wn', () => {
-  db.run(
-    `CREATE TABLE wNames (id_name INTEGER PRIMARY KEY AUTOINCREMENT, 
-                                        name);`
-  )
-})
+// app.post('/create-db-wn', () => {
+//   db.run(
+//     `CREATE TABLE wNames (id_name INTEGER PRIMARY KEY AUTOINCREMENT, 
+//                                         name);`
+//   )
+// })
 
 app.post('/create-db-wn2', () => {
   db.run(
@@ -131,9 +133,9 @@ app.delete('/wNum/:car_number', (req, res) => {
 })
 
 // удаление по владельцу
-app.delete('/wNames/:id_name', (req, res) => {
+app.delete('/wNum/:id_name', (req, res) => {
   const { id_name } = req.params
-  const sql = `DELETE FROM wNames WHERE id_name = ?`
+  const sql = `DELETE FROM wNum WHERE id_name = ?`
   db.run(sql, [id_name], (error) => {
     if (error) return console.error(error);
     res.send({ message: 'Deleted' })
@@ -178,34 +180,40 @@ app.delete('/bNames/:name', (req, res) => {
 
 // получаем white данные из бд по номеру
 app.get('/wNum', (req, res) => {
+  const sql2 = `SELECT * FROM wNames2`
+  db.all(sql2, [], (error, rows) => {
+    if (error) return console.error(error);
+    ID_Name = rows.length
+    console.log(ID_Name + " id Name")
+  })
   const sql = `SELECT * FROM wNum`
   db.all(sql, [], (error, rows) => {
     if (error) return console.error(error);
     // let info = rows[9]
     res.send({ wNum: rows })
-    // console.log(info.name)
+    // console.log(sql.length)
   })
 })
 
 // получаем white данные из бд по имени
-app.get('/wNames', (req, res) => {
-  const sql = `SELECT * FROM wNames`
-  db.all(sql, [], (error, rows) => {
-    if (error) return console.error(error);
-    let info = rows.length
-    res.send({ wNames: rows })
-    console.log("info")
-  })
-})
+// app.get('/wNames', (req, res) => {
+//   const sql = `SELECT * FROM wNames`
+//   db.all(sql, [], (error, rows) => {
+//     if (error) return console.error(error);
+//     // let info = sql.length
+//     res.send({ wNames: rows })
+//     // console.log(info)
+//   })
+// })
 
 // получаем white данные из бд по имени
 app.get('/wNames2', (req, res) => {
   const sql = `SELECT * FROM wNames2`
   db.all(sql, [], (error, rows) => {
     if (error) return console.error(error);
-    // let info = rows.length
-    res.send({ wNames2: rows })
-    // console.log(info)
+    ID_Name = rows.length
+    // res.send({ wNames2: rows })
+    // console.log(sql)
   })
 })
 // =======================================================
@@ -216,7 +224,7 @@ app.get('/login', (req, res) => {
     if (error) return console.error(error);
     // let info = rows.length
     res.send({ login: rows })
-    // console.log(info)
+    console.log("запросы на логинизацию")
   })
 })
 //-------------------------------------------------------------------------------------------------------------------
@@ -231,15 +239,15 @@ app.get('/bNum', (req, res) => {
 })
 
 // получаем black данные из бд по имени
-app.get('/bNames', (req, res) => {
-  const sql = `SELECT * FROM bNames`
-  db.all(sql, [], (error, rows) => {
-    if (error) return console.error(error);
-    // let info = rows[3]
-    res.send({ bNames: rows })
-    // console.log(info.name)
-  })
-})
+// app.get('/bNames', (req, res) => {
+//   const sql = `SELECT * FROM bNames`
+//   db.all(sql, [], (error, rows) => {
+//     if (error) return console.error(error);
+//     // let info = rows[3]
+//     res.send({ bNames: rows })
+//     // console.log(info.name)
+//   })
+// })
 //==============================================================================================
 
 // // получаем данные из бд которые в текстовом файле
@@ -267,7 +275,10 @@ app.get('/bNames', (req, res) => {
 // добавление данных в белый список 
 
 app.post('/wNum', (req, res) => {
-  const { carNumber, name, id_name } = req.body;
+  // const wNames2 = `SELECT COUNT(id_name) FROM wNames2`
+  let id_name = ID_Name + 1;
+  console.log(id_name)
+  const { carNumber, name} = req.body;
   const sql = `INSERT INTO wNum(car_number, name, id_name) VALUES(?, ?, ?)`
   if (carNumber != '') {
     db.run(sql, [carNumber, name, id_name], (error) => {
@@ -278,14 +289,14 @@ app.post('/wNum', (req, res) => {
 })
 
 // добавление имени в белый список
-app.post('/wNames', (req, res) => {
-  const { name } = req.body;
-  const sql = `INSERT INTO wNames( name) VALUES( ?)`
-  db.run(sql, [name], (error) => {
-    if (error) return console.error(error);
-    res.send({ message: 'ok' })
-  })
-})
+// app.post('/wNames', (req, res) => {
+//   const { name } = req.body;
+//   const sql = `INSERT INTO wNames( name) VALUES( ?)`
+//   db.run(sql, [name], (error) => {
+//     if (error) return console.error(error);
+//     res.send({ message: 'ok' })
+//   })
+// })
 
 app.post('/wNames2', (req, res) => {
   const { name } = req.body;
