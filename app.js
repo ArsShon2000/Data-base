@@ -123,7 +123,7 @@ app.delete('/delete-db-b', () => {
 
 // delFunction
 //удаление по номеру
-app.delete('/wNum/:car_number', (req, res) => {
+app.delete('/wNum/cn/:car_number', (req, res) => {
   const { car_number } = req.params
   const sql = `DELETE FROM wNum WHERE car_number = ?`
   db.run(sql, [car_number], (error) => {
@@ -133,10 +133,12 @@ app.delete('/wNum/:car_number', (req, res) => {
 })
 
 // удаление по владельцу
-app.delete('/wNum/:id_name', (req, res) => {
+app.delete('/wNum/id/:id_name', (req, res) => {
   const { id_name } = req.params
+  parseInt(id_name)
+  console.log(typeof parseInt(id_name) + " на удаление")
   const sql = `DELETE FROM wNum WHERE id_name = ?`
-  db.run(sql, [id_name], (error) => {
+  db.run(sql, [parseInt(id_name)], (error) => {
     if (error) return console.error(error);
     res.send({ message: 'Deleted' })
   })
@@ -277,8 +279,19 @@ app.get('/bNum', (req, res) => {
 app.post('/wNum', (req, res) => {
   // const wNames2 = `SELECT COUNT(id_name) FROM wNames2`
   let id_name = ID_Name + 1;
-  console.log(id_name)
+  console.log(id_name + " (id_name После добавления)")
   const { carNumber, name} = req.body;
+  const sql = `INSERT INTO wNum(car_number, name, id_name) VALUES(?, ?, ?)`
+  if (carNumber != '') {
+    db.run(sql, [carNumber, name, id_name], (error) => {
+      if (error) return console.error(error);
+      res.send({ message: 'ok' })
+    })
+  }
+})
+
+app.post('/wNumWithId', (req, res) => {
+  const { carNumber, name, id_name} = req.body;
   const sql = `INSERT INTO wNum(car_number, name, id_name) VALUES(?, ?, ?)`
   if (carNumber != '') {
     db.run(sql, [carNumber, name, id_name], (error) => {
