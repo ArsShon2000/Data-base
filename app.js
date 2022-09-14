@@ -5,6 +5,7 @@ let bool = true
 const express = require('express')
 const cors = require('cors')
 const sqlite3 = require('sqlite3').verbose();
+const fs = require('fs')
 
 const app = express()
 const bodyParser = require('body-parser')
@@ -252,25 +253,19 @@ app.get('/bNum', (req, res) => {
 // })
 //==============================================================================================
 
-// // получаем данные из бд которые в текстовом файле
-// app.get('/genNomLong', (req, res) => {
-//   const sql = `SELECT * FROM genNomLong`
-//   db.all(sql, [], (error, rows) => {
-//     if (error) return console.error(error);
-//     res.send({ genNomLong: rows})
-//   })
-// })
-
-
-// // получаем данные из бд которые в текстовом файле
-// app.get('/genNomShort', (req, res) => {
-//   const sql = `SELECT * FROM genNomShort`
-//   db.all(sql, [], (error, rows) => {
-//     if (error) return console.error(error);
-//     res.send({ genNomShort: rows})
-//   })
-// })
-
+// получаем данные из бд которые в текстовом файле
+app.get('/genNum', (req, res) => {
+  fs.readFile('carNumber.txt', (error, data) => {
+    if (error) { return console.error(error); }
+    else {
+      // const carNumber = parseInt(data)
+      // data.toString()
+      res.send({ genNum: data.toString() })
+      console.log(typeof(data.toString()) + " data")
+      res.end()
+    }
+  })
+})
 
 //==============================================================================================
 
@@ -280,7 +275,7 @@ app.post('/wNum', (req, res) => {
   // const wNames2 = `SELECT COUNT(id_name) FROM wNames2`
   let id_name = ID_Name + 1;
   console.log(id_name + " (id_name После добавления)")
-  const { carNumber, name} = req.body;
+  const { carNumber, name } = req.body;
   const sql = `INSERT INTO wNum(car_number, name, id_name) VALUES(?, ?, ?)`
   if (carNumber != '') {
     db.run(sql, [carNumber, name, id_name], (error) => {
@@ -370,15 +365,6 @@ app.post('/bNames', (req, res) => {
 // })
 // })
 
-// // добавление данных из текстового файла
-// app.post('/genNomShort', (req, res) => {
-//   const {carNumber} = req.body;
-//   const sql = `INSERT INTO genNomShort(car_number) VALUES('short.txt',readfile('short.txt'))`
-// db.run(sql, [ carNumber], (error) => {
-//   if (error) return console.error(error);
-//   res.send({message: 'ok'})
-// })
-// })
 
 //==============================================================================================
 
