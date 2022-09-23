@@ -68,10 +68,10 @@ app.post('/create-login', () => {
 //-------------------------------------------------------------------------------------------------------------------
 
 // создание списка для черного списка
-app.post('/create-db-bn', () => {
+app.post('/create-db-bn2', () => {
   db.run(
-    `CREATE TABLE bNames(id INTEGER PRIMARY KEY AUTOINCREMENT, 
-        name);`
+    `CREATE TABLE bNames2 (id_name INTEGER PRIMARY KEY AUTOINCREMENT, 
+      name);`
   )
 })
 
@@ -79,12 +79,9 @@ app.post('/create-db-bn', () => {
 app.post('/create-db-b', () => {
   db.run(
     `CREATE TABLE bNum(id INTEGER PRIMARY KEY AUTOINCREMENT,
-          car_number TEXT UNIQUE, 
-          name,
-          id_name,
-          CONSTRAINT fk_bNames
-          FOREIGN KEY (id_name) REFERENCES bNames (id_name)
-          );`
+      id_name,
+      name, 
+      car_number TEXT UNIQUE);`
   )
 })
 //==============================================================================================
@@ -108,14 +105,14 @@ app.post('/create-db-b', () => {
 
 //==============================================================================================
 
-app.delete('/delete-db-W', () => {
+app.delete('/delete-db-w', () => {
   db.run(
-    `DROP TABLE WNum;`
+    `DROP TABLE wNum;`
   )
 })
 //-------------------------------------------------------------------------------------------------------------------
 
-app.delete('/delete-db-b', () => {
+app.delete('/delete-db-B', () => {
   db.run(
     `DROP TABLE bNum;`
   )
@@ -160,7 +157,7 @@ app.delete('/login/:bool', (req, res) => {
 //-------------------------------------------------------------------------------------------------------------------
 
 //удаление по номеру
-app.delete('/bNum/:car_number', (req, res) => {
+app.delete('/bNum/cn/:car_number', (req, res) => {
   const { car_number } = req.params
   const sql = `DELETE FROM bNum WHERE car_number = ?`
   db.run(sql, [car_number], (error) => {
@@ -170,10 +167,11 @@ app.delete('/bNum/:car_number', (req, res) => {
 })
 
 // удаление по владельцу
-app.delete('/bNames/:name', (req, res) => {
-  const { name } = req.params
-  const sql = `DELETE FROM bNames WHERE name = ?`
-  db.run(sql, [name], (error) => {
+app.delete('/bNum/id/:id_name', (req, res) => {
+  const { id_name } = req.params
+  parseInt(id_name)
+  const sql = `DELETE FROM bNum WHERE name = ?`
+  db.run(sql, [parseInt(id_name)], (error) => {
     if (error) return console.error(error);
     res.send({ message: 'Deleted' })
   })
@@ -234,6 +232,11 @@ app.get('/login', (req, res) => {
 
 // получаем black данные из бд
 app.get('/bNum', (req, res) => {
+  const sql2 = `SELECT * FROM bNames2`
+  db.all(sql2, [], (error, rows) => {
+    if (error) return console.error(error);
+    ID_Name = rows.length
+  })
   const sql = `SELECT * FROM bNum`
   db.all(sql, [], (error, rows) => {
     if (error) return console.error(error);
@@ -242,15 +245,15 @@ app.get('/bNum', (req, res) => {
 })
 
 // получаем black данные из бд по имени
-// app.get('/bNames', (req, res) => {
-//   const sql = `SELECT * FROM bNames`
-//   db.all(sql, [], (error, rows) => {
-//     if (error) return console.error(error);
-//     // let info = rows[3]
-//     res.send({ bNames: rows })
-//     // console.log(info.name)
-//   })
-// })
+app.get('/bNames2', (req, res) => {
+  const sql = `SELECT * FROM bNames2`
+  db.all(sql, [], (error, rows) => {
+    if (error) return console.error(error);
+    // let info = rows[3]
+    ID_Name = rows.length
+    // console.log(info.name)
+  })
+})
 //==============================================================================================
 
 // получаем данные из бд которые в текстовом файле
@@ -308,7 +311,7 @@ app.post('/wNumWithId', (req, res) => {
 
 app.post('/wNames2', (req, res) => {
   const { name } = req.body;
-  const sql = `INSERT INTO wNames2 ( name) VALUES( ?)`
+  const sql = `INSERT INTO wNames2 (name) VALUES( ?)`
   db.run(sql, [name], (error) => {
     if (error) return console.error(error);
     res.send({ message: 'ok' })
@@ -333,7 +336,9 @@ app.post('/login', (req, res) => {
 
 // добавление данных в черный список
 app.post('/bNum', (req, res) => {
-  const { carNumber, name, id_name } = req.body;
+  let id_name = ID_Name + 1;
+  console.log(id_name + " (id_name После добавления)")
+  const { carNumber, name } = req.body;
   const sql = `INSERT INTO bNum(car_number, name, id_name) VALUES(?, ?, ?)`
   if (carNumber != '') {
     db.run(sql, [carNumber, name, id_name], (error) => {
@@ -344,26 +349,14 @@ app.post('/bNum', (req, res) => {
 })
 
 // добавление имени в черный список
-app.post('/bNames', (req, res) => {
+app.post('/bNames2', (req, res) => {
   const { name } = req.body;
-  const sql = `INSERT INTO bNames(name) VALUES(?)`
+  const sql = `INSERT INTO bNames2 (name) VALUES(?)`
   db.run(sql, [name], (error) => {
     if (error) return console.error(error);
     res.send({ message: 'ok' })
   })
 })
-
-//==============================================================================================
-
-// // добавление данных из текстового файла
-// app.post('/genNomLong', (req, res) => {
-//   const {carNumber} = req.body;
-//   const sql = `INSERT INTO genNomLong(car_number) VALUES('long.txt',readfile('long.txt'))`
-// db.run(sql, [ carNumber], (error) => {
-//   if (error) return console.error(error);
-//   res.send({message: 'ok'})
-// })
-// })
 
 
 //==============================================================================================
