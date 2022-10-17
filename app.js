@@ -16,6 +16,11 @@ const db = new sqlite3.Database('./mock.db', sqlite3.OPEN_READWRITE, (error) => 
 })
 let ID_Name
 let posetitely = 0
+let setYear = "2022"
+let setMonth = "10"
+let setDay = "13"
+
+
 
 app.use(bodyParser.json())
 const corsOptions = {
@@ -33,6 +38,86 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 app.use(bodyParser.urlencoded({ extended: true }))
+
+
+
+
+
+
+// =====================Получаю все видео из указанной папки==========================
+
+
+let path = require('path');
+let async = require('async');
+
+
+function getFiles (dirPath, callback) {
+
+    fs.readdir(dirPath, function (err, files) {
+        if (err) return callback(err);
+
+        var filePaths = [];
+        async.eachSeries(files, function (fileName, eachCallback) {
+          let filePath = path.join(dirPath, fileName);
+
+            fs.stat(filePath, function (err, stat) {
+                if (err) return eachCallback(err);
+
+                if (stat.isDirectory()) {
+                    getFiles(filePath, function (err, subDirFiles) {
+                        if (err) return eachCallback(err);
+
+                        filePaths = filePaths.concat(subDirFiles);
+                        eachCallback(null);
+                    });
+
+                } else {
+                    if (stat.isFile() && /\.mp4$/.test(filePath)) {
+                        filePaths.push(filePath);
+                    }
+
+                    eachCallback(null);
+                }
+            });
+        }, function (err) {
+            callback(err, filePaths);
+        });
+
+    });
+}
+
+// getFiles('C:/develop/playgraund/FinallyWork/my-app/src/Videobar/multi/', function (err, files) {
+//   console.log(err || files);
+// });
+
+
+app.get('/archiveList', (req, res) => {
+  getFiles(`C:/develop/playgraund/FinallyWork/my-app/src/Videobar/multi/${setYear}/${setMonth}/${setDay}`, function (err, files){
+    console.log("запрос на получение видео из архива");
+    console.log(err || files);
+    if (err) return console.error(err);
+    res.send({files,setYear,setMonth,setDay})
+  })
+})
+
+// =====================Получаю все видео из указанной папки==========================
+
+
+app.post('/archiveList/byDate', (req, res) => {
+  setYear = req.body.year.toString()
+  setMonth = req.body.month.toString()
+  setDay = req.body.day.toString()
+  console.log(req.body.year + "----------------------------------------")
+  console.log(req.body.month + "----------------------------------------")
+  console.log(req.body.day + "----------------------------------------")
+  console.log(typeof(setYear))
+  res.send({ message: 'ok' })
+  
+})
+
+
+
+
 //==============================================================================================
 
 // создание списка имен для белого списка
@@ -142,6 +227,18 @@ app.delete('/wNum/id/:id_name', (req, res) => {
   })
 })
 
+// переопределение потока камеры
+app.put('/Cameras/id/:id_name', (req, res) => {
+  const { id_name} = req.params
+  const { edit_stream, edit_mode  } = req.body;
+  const sql = `UPDATE videoStreams SET nameStream = ?, editMode = ? WHERE id_name = ?`
+  db.run(sql, [ edit_stream, edit_mode, parseInt(id_name)], (error) => {
+    if (error) return console.error(error);
+    res.send({ message: 'updated' })
+  })
+})
+
+
 
 // ==========================================================
 // logout
@@ -178,6 +275,8 @@ app.delete('/bNum/id/:id_name', (req, res) => {
 })
 // delFunction
 //==============================================================================================
+
+
 
 // получаем white данные из бд по номеру
 app.get('/wNum', (req, res) => {
@@ -256,6 +355,17 @@ app.get('/bNames2', (req, res) => {
 })
 //==============================================================================================
 
+// получаем данные из бд videoStreams
+app.get('/Cameras', (req, res) => {
+  const sql = `SELECT * FROM videoStreams`
+  db.all(sql, [], (error, rows) => {
+    if (error) return console.error(error);
+    // let info = rows.length
+    res.send({ videoStreams: rows })
+    console.log("запросы на потоки")
+  })
+})
+
 // получаем данные из бд которые в текстовом файле
 app.get('/genNum', (req, res) => {
   fs.readFile('carNumber.txt', (error, data) => {
@@ -264,7 +374,7 @@ app.get('/genNum', (req, res) => {
       // const carNumber = parseInt(data)
       // data.toString()
       res.send({ genNum: data.toString() })
-      console.log(typeof(data.toString()) + " data")
+      console.log(typeof(data.toString()) + " data car number")
       res.end()
     }
   })
