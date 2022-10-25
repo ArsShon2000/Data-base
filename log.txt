@@ -1,0 +1,13 @@
+The light prop will render a video thumbnail with
+ simple play icon, and only load the full player once a user 
+has interacted with the image. Noembed is used to
+ fetch thumbnails for a video URL. Note that automatic 
+thumbnail fetching for Facebook, Wistia, Mixcloud
+ and file URLs are not supported, and 
+ongoing support for other URLs is not guaranteed.
+If you want to pass in your own thumbnail to use,
+ set light to the image URL rather than true.
+The styles for the preview image and play icon 
+can be overridden by targeting the CSS classes 
+react-player__preview, 
+react-player__shadow and react-player__play-icon.

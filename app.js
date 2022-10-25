@@ -380,6 +380,20 @@ app.get('/genNum', (req, res) => {
   })
 })
 
+// получаем данные из бд которые в текстовом файле log.txt  
+app.get('/logFile', (req, res) => {
+  fs.readFile('log.txt', (error, data) => {
+    if (error) { return console.error(error); }
+    else {
+      // const carNumber = parseInt(data)
+      // data.toString()
+      res.send({ log: data.toString() })
+      console.log(typeof(data.toString()) + " data car number")
+      res.end()
+    }
+  })
+})
+
 //==============================================================================================
 
 // добавление данных в белый список 
