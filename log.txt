@@ -1,13 +1,45 @@
-The light prop will render a video thumbnail with
- simple play icon, and only load the full player once a user 
-has interacted with the image. Noembed is used to
- fetch thumbnails for a video URL. Note that automatic 
-thumbnail fetching for Facebook, Wistia, Mixcloud
- and file URLs are not supported, and 
-ongoing support for other URLs is not guaranteed.
-If you want to pass in your own thumbnail to use,
- set light to the image URL rather than true.
-The styles for the preview image and play icon 
-can be overridden by targeting the CSS classes 
-react-player__preview, 
-react-player__shadow and react-player__play-icon.
+28 Апреля 2013, 22.54 /forum; deleting thread username (Администраторы) 123.45.67.89 сайтик (78)
+
+Удаление темы — Название и ID удаленной
+
+28 Апреля 2013, 22.54 /forum; joining threads username (Администраторы) 123.45.67.89 Thread ID: 78
+
+Соединение тем — ID темы, в которую произошло объединение
+
+28 Апреля 2013, 22.53 /forum; spliting thread username (Администраторы) 123.45.67.89 Thread IDs: (109,112)
+
+Разделение темы — ID темы, которую разделили, и ID новой темы
+
+28 Апреля 2013, 22.53 /forum; making first message persistent username (Администраторы) 123.45.67.89 Thread ID: 109
+
+Делаем первое сообщение шапкой темы — ID темы с прикрепленным сообщением
+
+28 Апреля 2013, 22.52 /forum; making thread sticky username (Администраторы) 123.45.67.89 Thread ID: 109
+
+Важная прикрепленная тема — ID темы
+
+28 Апреля 2013, 22.52 /forum; opening thread username (Администраторы) 123.45.67.89 Thread ID: 109
+
+Открыть тему — ID открытой темы
+
+28 Апреля 2013, 22.52 /forum; closing thread username (Администраторы) 123.45.67.89 Thread ID: 109
+
+Закрыть тему — ID закрытой темы
+
+28 Апреля 2013, 22.52 /forum; moving messages username (Администраторы) 123.45.67.89 Entry IDs: 335
+
+Перемещение сообщений — ID сообщения, которое перенесли
+
+28 Апреля 2013, 22.50 /forum; moving thread username (Администраторы) 123.45.67.89 Thread ID: 111
+
+Переместить тему — ID перемещенной темы
+
+28 Апреля 2013, 22.50 /forum; editing message username (Администраторы) 123.45.67.89 Thread ID: 111; Entry ID: 334
+
+Отредактированное сообщение — ID темы и ID сообщения
+
+28 Апреля 2013, 22.42 /forum; deleting thread username (Администраторы) 123.45.67.89 ghmcmcm (110)
+
+Удалить тему — Название и ID удаленной темы
+
+28 Апреля 2013, 23.09 /forum; editing poll data username (Администраторы) 123.45.67.89 Thread ID: 111

@@ -141,7 +141,9 @@ app.post('/create-db-w', () => {
     `CREATE TABLE wNum(id INTEGER PRIMARY KEY AUTOINCREMENT,
       id_name,
       name, 
-      car_number TEXT UNIQUE);`
+      car_number TEXT UNIQUE,
+      workPosition,
+      telNumber);`
   )
 })
 
@@ -166,7 +168,9 @@ app.post('/create-db-b', () => {
     `CREATE TABLE bNum(id INTEGER PRIMARY KEY AUTOINCREMENT,
       id_name,
       name, 
-      car_number TEXT UNIQUE);`
+      car_number TEXT UNIQUE,
+      workPosition,
+      telNumber);`
   )
 })
 //==============================================================================================
@@ -388,7 +392,7 @@ app.get('/logFile', (req, res) => {
       // const carNumber = parseInt(data)
       // data.toString()
       res.send({ log: data.toString() })
-      console.log(typeof(data.toString()) + " data car number")
+      console.log(typeof(data.toString()) + " data log")
       res.end()
     }
   })
@@ -402,10 +406,10 @@ app.post('/wNum', (req, res) => {
   // const wNames2 = `SELECT COUNT(id_name) FROM wNames2`
   let id_name = ID_Name + 1;
   console.log(id_name + " (id_name После добавления)")
-  const { carNumber, name } = req.body;
-  const sql = `INSERT INTO wNum(car_number, name, id_name) VALUES(?, ?, ?)`
+  const { carNumber, name, workPosition, telNumber } = req.body;
+  const sql = `INSERT INTO wNum(car_number, name, id_name, workPosition, telNumber ) VALUES(?, ?, ?, ?, ?)`
   if (carNumber != '') {
-    db.run(sql, [carNumber, name, id_name], (error) => {
+    db.run(sql, [carNumber, name, id_name, workPosition, telNumber ], (error) => {
       if (error) return console.error(error);
       res.send({ message: 'ok' })
     })
@@ -462,10 +466,10 @@ app.post('/login', (req, res) => {
 app.post('/bNum', (req, res) => {
   let id_name = ID_Name + 1;
   console.log(id_name + " (id_name После добавления)")
-  const { carNumber, name } = req.body;
-  const sql = `INSERT INTO bNum(car_number, name, id_name) VALUES(?, ?, ?)`
+  const { carNumber, name, workPosition, telNumber } = req.body;
+  const sql = `INSERT INTO bNum(car_number, name, id_name, workPosition, telNumber) VALUES(?, ?, ?, ?, ?)`
   if (carNumber != '') {
-    db.run(sql, [carNumber, name, id_name], (error) => {
+    db.run(sql, [carNumber, name, id_name, workPosition, telNumber], (error) => {
       if (error) return console.error(error);
       res.send({ message: 'ok' })
     })
