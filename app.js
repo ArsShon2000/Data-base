@@ -139,11 +139,9 @@ app.post('/create-db-wn2', () => {
 app.post('/create-db-w', () => {
   db.run(
     `CREATE TABLE wNum(id INTEGER PRIMARY KEY AUTOINCREMENT,
-      id_name,
-      name, 
-      car_number TEXT UNIQUE,
-      workPosition,
-      telNumber);`
+      id_name INTEGER,
+      name CHAR(16), 
+      car_number TEXT UNIQUE);`
   )
 })
 
@@ -366,7 +364,7 @@ app.get('/Cameras', (req, res) => {
     if (error) return console.error(error);
     // let info = rows.length
     res.send({ videoStreams: rows })
-    console.log("запросы на потоки")
+    console.log("запросы на видео потоки")
   })
 })
 
@@ -406,10 +404,10 @@ app.post('/wNum', (req, res) => {
   // const wNames2 = `SELECT COUNT(id_name) FROM wNames2`
   let id_name = ID_Name + 1;
   console.log(id_name + " (id_name После добавления)")
-  const { carNumber, name, workPosition, telNumber } = req.body;
-  const sql = `INSERT INTO wNum(car_number, name, id_name, workPosition, telNumber ) VALUES(?, ?, ?, ?, ?)`
+  const { carNumber, name} = req.body;
+  const sql = `INSERT INTO wNum(car_number, name, id_name ) VALUES(?, ?, ?)`
   if (carNumber != '') {
-    db.run(sql, [carNumber, name, id_name, workPosition, telNumber ], (error) => {
+    db.run(sql, [carNumber, name, id_name], (error) => {
       if (error) return console.error(error);
       res.send({ message: 'ok' })
     })
