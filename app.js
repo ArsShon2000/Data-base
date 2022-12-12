@@ -368,19 +368,46 @@ app.get('/Cameras', (req, res) => {
   })
 })
 
-// получаем данные из бд которые в текстовом файле
-app.get('/genNum', (req, res) => {
-  fs.readFile('carNumber.txt', (error, data) => {
+function getNumbers (fileNameCarNumber, id_name_car_number){
+  fs.readFile(fileNameCarNumber, (error, data) => {
     if (error) { return console.error(error); }
     else {
-      // const carNumber = parseInt(data)
-      // data.toString()
-      res.send({ genNum: data.toString() })
-      console.log(typeof(data.toString()) + " data car number")
-      res.end()
+      const sql = `UPDATE videoStreams SET carNumbers = ? WHERE id_name = ?`
+        db.run(sql, [ data.toString(), id_name_car_number ], (error) => {
+        if (error) return console.error(error);
+      })
     }
   })
+
+
+}
+
+// получаем данные из бд которые в текстовом файле
+app.get('/genNum', (req, res) => {
+  getNumbers('carNumberFromFirstCamera.txt', 1)
+  getNumbers('carNumberFromSecondCamera.txt', 2)
+  getNumbers('carNumberFromThirdCamera.txt', 3)
+  getNumbers('carNumberFromFourthCamera.txt', 4)
+  const sql = `SELECT carNumbers FROM videoStreams`
+  db.all(sql, [], (error, rows) => {
+    if (error) return console.error(error);
+    // let info = rows.length
+    res.send({ numbers: rows })
+    console.log("запросы на видео потоки")
+  })
 })
+
+// // получаем данные из бд которые в текстовом файле
+// app.get('/genNum', (req, res) => {
+//   fs.readFile('carNumber.txt', (error, data) => {
+//     if (error) { return console.error(error); }
+//     else {
+//       res.send({ genNum: data.toString() })
+//       console.log(typeof(data.toString()) + " data car number")
+//       res.end()
+//     }
+//   })
+// })
 
 // получаем данные из бд которые в текстовом файле log.txt  
 app.get('/logFile', (req, res) => {
